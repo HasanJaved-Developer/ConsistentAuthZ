@@ -1,8 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
+using SharedLibrary.Cache;
 using System.Text.Json;
-using UserManagement.Sdk.Abstractions;
 using UserManagementApi.Contracts.Models;
 
 namespace ApiIntegrationMvc.Views.Shared.Components
@@ -10,23 +8,20 @@ namespace ApiIntegrationMvc.Views.Shared.Components
 
     public sealed class CategoryTreeViewComponent: ViewComponent
     {
-        private readonly IAccessTokenProvider _tokens;
-        public CategoryTreeViewComponent(IAccessTokenProvider tokens)
+        private readonly ICacheAccessProvider _tokens;
+        public CategoryTreeViewComponent(ICacheAccessProvider tokens)
         => _tokens = tokens;
     
         public async Task<IViewComponentResult> InvokeAsync()
         {
-            var ct = HttpContext?.RequestAborted ?? default;
-            var token = await _tokens.GetAccessTokenAsync(ct);
+            var ct = HttpContext?.RequestAborted ?? default;            
+
+            var permissions = await _tokens.GetUserPermissionsAsync(ct);            
             
-            var handler = new JwtSecurityTokenHandler();
-            var jwt = handler.ReadJwtToken(token);
-            IEnumerable<Claim> claims = jwt.Claims;
-            var list = claims.Where(c => c.Type == "categories").Select(c => c.Value).ToList();
             IReadOnlyList<Category> categories = new List<Category>();
-            if (list.Count == 1)
+            if (permissions != null)
             {
-                categories = JsonSerializer.Deserialize<List<Category>>(list[0]);
+                categories = JsonSerializer.Deserialize<List<Category>>(permissions);
             }
 
             return View(categories); // Views/Shared/Components/CategoryTree/Default.cshtml
