@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using UserManagement.Contracts.DTO;
 
 namespace UserManagement.Contracts.Auth
 {    
@@ -10,6 +6,7 @@ namespace UserManagement.Contracts.Auth
       int UserId,
       string UserName,
       string Token,
-      DateTime ExpiresAtUtc 
+      DateTime ExpiresAtUtc,
+      List<CategoryDto> Categories
   );
 }
