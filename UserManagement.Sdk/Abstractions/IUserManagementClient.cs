@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using UserManagement.Contracts.Auth;
+﻿using UserManagement.Contracts.Auth;
+using UserManagement.Contracts.DTO;
 
 namespace UserManagement.Sdk.Abstractions
 {
