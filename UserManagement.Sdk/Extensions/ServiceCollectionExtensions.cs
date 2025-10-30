@@ -1,10 +1,10 @@
-﻿using System;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Polly;
+using SharedLibrary.Auths;
+using SharedLibrary.Cache;
 using UserManagement.Sdk.Abstractions;
-using UserManagement.Sdk.Auth;
 using UserManagement.Sdk.Configuration;
 
 
@@ -30,7 +30,7 @@ namespace UserManagement.Sdk.Extensions
             services.AddTransient<BearerTokenHandler>();
 
             // Register the token provider (memory-based)
-            services.AddScoped<IAccessTokenProvider, MemoryCacheAccessTokenProvider>();
+            services.AddScoped<ICacheAccessProvider, CacheAccessProvider>();
 
 
             // The Typed client
