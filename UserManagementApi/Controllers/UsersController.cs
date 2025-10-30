@@ -7,9 +7,9 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using UserManagement.Contracts.Auth;
+using UserManagement.Contracts.DTO;
 using UserManagementApi.Contracts.Models;
 using UserManagementApi.Data;
-using UserManagementApi.DTO;
 using UserManagementApi.DTO.Auth;
 
 
@@ -34,7 +34,7 @@ namespace UserManagementApi.Controllers
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
 
-        public async Task<ActionResult<AuthResponse>> Authenticate([FromBody] DTO.LoginRequest req)
+        public async Task<ActionResult<AuthResponse>> Authenticate([FromBody] LoginRequest req)
         {
             if (string.IsNullOrWhiteSpace(req.UserName) || string.IsNullOrWhiteSpace(req.Password))
             {
@@ -69,9 +69,9 @@ namespace UserManagementApi.Controllers
    
             var dto = await BuildPermissionsForUser(user.Id);
                         
-            var token = GenerateJwt(user, dto.Categories, out var expiresAtUtc);
+            var token = GenerateJwt(user, out var expiresAtUtc);
                        
-            return Ok(new AuthResponse(user.Id, user.UserName, token, expiresAtUtc));
+            return Ok(new AuthResponse(user.Id, user.UserName, token, expiresAtUtc, dto.Categories));
         }
 
         // --------- (Existing) GET /api/users/{userId}/permissions ----------
@@ -150,7 +150,7 @@ namespace UserManagementApi.Controllers
             return new UserPermissionsDto(user.Id, user.UserName, categoryDtos);
         }
                 
-        protected virtual string GenerateJwt(AppUser user, List<CategoryDto> Categories, out DateTime expiresAtUtc)
+        protected virtual string GenerateJwt(AppUser user, out DateTime expiresAtUtc)
         {
             var keyBase64 = _jwt.Key;
             var keyPlain = Encoding.UTF8.GetString(Convert.FromBase64String(keyBase64));
@@ -164,12 +164,6 @@ namespace UserManagementApi.Controllers
                 new(JwtRegisteredClaimNames.UniqueName, user.UserName)
             };
             
-            
-            // optional: add claims (careful: keep token size reasonable)
-            var categoriesJson = System.Text.Json.JsonSerializer.Serialize(Categories);
-            claims.Add(new Claim("categories", categoriesJson));
-            
-
             var now = DateTime.UtcNow;
             expiresAtUtc = now.AddMinutes(_jwt.ExpiresMinutes);
 

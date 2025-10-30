@@ -2,6 +2,7 @@
 using System.Net.Http.Json;
 using System.Text.Json;
 using UserManagement.Contracts.Auth;
+using UserManagement.Contracts.DTO;
 using UserManagement.Sdk.Abstractions;
 
 namespace UserManagement.Sdk
