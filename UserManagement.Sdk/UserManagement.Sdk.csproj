@@ -22,6 +22,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\SharedLibrary\SharedLibrary.csproj" />
     <ProjectReference Include="..\UserManagement.Contracts\UserManagement.Contracts.csproj" />
   </ItemGroup>
 
