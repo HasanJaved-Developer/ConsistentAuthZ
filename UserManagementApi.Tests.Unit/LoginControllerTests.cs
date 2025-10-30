@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Moq;
+using UserManagement.Contracts.DTO;
 using UserManagementApi.Data;
 using UserManagementApi.DTO;
 using UserManagementApi.DTO.Auth;

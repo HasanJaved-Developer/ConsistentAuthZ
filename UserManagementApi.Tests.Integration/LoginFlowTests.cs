@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using System.Net;
 using System.Net.Http.Json;
 using UserManagement.Contracts.Auth;
+using UserManagement.Contracts.DTO;
 
 namespace UserManagementApi.Tests.Integration
 {

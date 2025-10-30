@@ -1,13 +1,8 @@
 ﻿using Microsoft.Extensions.Options;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using UserManagement.Contracts.DTO;
 using UserManagementApi.Contracts.Models;
 using UserManagementApi.Controllers;
 using UserManagementApi.Data;
-using UserManagementApi.DTO;
 using UserManagementApi.DTO.Auth;
 
 namespace UserManagementApi.Tests.Unit
@@ -30,7 +25,7 @@ namespace UserManagementApi.Tests.Unit
         protected override Task<UserPermissionsDto> BuildPermissionsForUser(int userId)
             => Task.FromResult(_permToReturn);
 
-        protected override string GenerateJwt(AppUser user, List<CategoryDto> Categories, out DateTime expiresAtUtc)
+        protected override string GenerateJwt(AppUser user, out DateTime expiresAtUtc)
         {
             expiresAtUtc = _expToReturn;
             return _jwtToReturn;
