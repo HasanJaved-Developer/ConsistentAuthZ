@@ -4,9 +4,10 @@ using CentralizedLogging.Sdk.Abstractions;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
+using SharedLibrary.Cache;
 using System.Security.Claims;
 using System.Text.Json;
-using UserManagement.Contracts.Auth;
+using UserManagement.Contracts.DTO;
 using UserManagement.Sdk.Abstractions;
 
 namespace ApiIntegrationMvc.Areas.Account.Controllers
@@ -15,11 +16,11 @@ namespace ApiIntegrationMvc.Areas.Account.Controllers
     public class LoginController : Controller
     {
         private readonly IUserManagementClient _users;
-        private readonly UserManagement.Sdk.Abstractions.IAccessTokenProvider _cache;
+        private readonly ICacheAccessProvider _cache;
         private readonly IHttpContextAccessor _http;
         private readonly ICentralizedLoggingClient _centralizedlogs;
         public LoginController(IUserManagementClient users, ICentralizedLoggingClient centralizedlogs,
-            UserManagement.Sdk.Abstractions.IAccessTokenProvider cache, IHttpContextAccessor http) => (_users, _centralizedlogs, _cache, _http) = (users, centralizedlogs, cache, http);
+            ICacheAccessProvider cache, IHttpContextAccessor http) => (_users, _centralizedlogs, _cache, _http) = (users, centralizedlogs, cache, http);
 
         [HttpGet]
         [ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
@@ -72,8 +73,11 @@ namespace ApiIntegrationMvc.Areas.Account.Controllers
                         ExpiresUtc = result.ExpiresAtUtc.AddMinutes(-5)
                     });
 
-
+                
                 _cache.SetAccessToken(result.Token, result.UserId, result.ExpiresAtUtc);
+
+                var categoriesJson = System.Text.Json.JsonSerializer.Serialize(result.Categories);
+                _cache.SetUserPermissions(categoriesJson, result.UserId, result.ExpiresAtUtc);
 
                 return RedirectToAction("Index", "Home", new { area = "Home" });
             }

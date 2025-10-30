@@ -1,5 +1,6 @@
 ﻿using CentralizedLogging.Sdk.Abstractions;
 using Microsoft.AspNetCore.Mvc;
+using SharedLibrary.Cache;
 
 namespace ApiIntegrationMvc.Areas.Admin.Controllers
 {
@@ -7,9 +8,9 @@ namespace ApiIntegrationMvc.Areas.Admin.Controllers
     public class ErrorController : Controller
     {
         private readonly ICentralizedLoggingClient _centralizedlogs;
-        private readonly IAccessTokenProvider _cache;
+        private readonly ICacheAccessProvider _cache;
         private readonly IHttpContextAccessor _http;
-        public ErrorController(ICentralizedLoggingClient centralizedlogs, IAccessTokenProvider cache, IHttpContextAccessor http) => (_centralizedlogs, _cache, _http) = (centralizedlogs, cache, http);
+        public ErrorController(ICentralizedLoggingClient centralizedlogs, ICacheAccessProvider cache, IHttpContextAccessor http) => (_centralizedlogs, _cache, _http) = (centralizedlogs, cache, http);
 
         public async Task<IActionResult> Index(CancellationToken ct)
         {

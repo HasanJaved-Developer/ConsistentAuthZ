@@ -1,5 +1,6 @@
 using ApiIntegrationMvc.Areas.Account.Models;
 using Microsoft.AspNetCore.Mvc;
+using SharedLibrary.Cache;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -14,10 +15,10 @@ namespace ApiIntegrationMvc.Areas.Home.Controllers
     [Area("Home")]
     public class HomeController : Controller
     {
-        private readonly IAccessTokenProvider _tokens;
+        private readonly ICacheAccessProvider _tokens;
 
 
-        public HomeController(IAccessTokenProvider tokens) => _tokens = tokens;
+        public HomeController(ICacheAccessProvider tokens) => _tokens = tokens;
        
         public async Task<IActionResult> Index(CancellationToken ct)
         {            
