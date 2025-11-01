@@ -20,7 +20,7 @@ namespace ApiIntegrationMvc.Areas.Home.Controllers
 
         public HomeController(ICacheAccessProvider tokens) => _tokens = tokens;
        
-        public async Task<IActionResult> Index(CancellationToken ct)
+        public IActionResult Index(CancellationToken ct)
         {            
             return View();
         }
