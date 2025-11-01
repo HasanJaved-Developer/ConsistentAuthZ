@@ -1,11 +1,17 @@
 using ApiIntegrationMvc;
 using CentralizedLogging.Sdk.Extensions;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using OpenTelemetry.Exporter;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using Serilog;
 using SharedLibrary;
+using SharedLibrary.Auth;
+using SharedLibrary.Auths;
+using SharedLibrary.Cache;
 using UserManagement.Sdk.Extensions;
 
 
@@ -20,12 +26,18 @@ Log.Logger = new LoggerConfiguration()
 
 builder.Host.UseSerilog();
 
-// Add MemoryCache globally
-builder.Services.AddMemoryCache();
+// Add IDistributedCache globally
+var env = builder.Environment.EnvironmentName; 
+builder.Services.AddRedisCacheSupport(builder.Configuration, $"{env}:");
+
 builder.Services.AddHttpContextAccessor(); // required for the above
 
 builder.Services.AddUserManagementSdk();
 builder.Services.AddCentralizedLoggingSdk();
+// Delegating handler MUST be transient
+builder.Services.AddTransient<BearerTokenHandler>();
+// Register the token provider (memory-based)
+builder.Services.AddScoped<ICacheAccessProvider, CacheAccessProvider>();
 
 
 // Add services to the container.
@@ -43,7 +55,14 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         o.ExpireTimeSpan = TimeSpan.FromHours(8);
     });
 
-builder.Services.AddAuthorization();
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy(PolicyType.WEB_LEVEL, p =>
+    {
+        p.RequireAuthenticatedUser();
+        p.Requirements.Add(new PermissionRequirement("Web"));
+    });
+});
 
 // OpenTelemetry + Jaeger
 builder.Services.AddOpenTelemetry()
@@ -58,6 +77,9 @@ builder.Services.AddOpenTelemetry()
             o.Endpoint = new Uri($"http://{builder.Configuration["JAEGER_HOST"]}:4317"); // host -> docker            
             o.Protocol = OtlpExportProtocol.Grpc;
         }));
+
+builder.Services.AddScoped<IAuthorizationHandler, PermissionHandler>();
+
 
 var app = builder.Build();
 app.UseSerilogRequestLogging(); // structured request logs

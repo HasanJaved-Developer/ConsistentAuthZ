@@ -3,6 +3,7 @@ using CentralizedLoggingApi.Data;
 using CentralizedLoggingApi.DTO.Auth;
 using CentralizedLoggingApi.Infrastructure;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -11,6 +12,8 @@ using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using Serilog;
 using SharedLibrary;
+using SharedLibrary.Auth;
+using SharedLibrary.Cache;
 using SharedLibrary.Middlewares;
 using System.Reflection;
 using System.Text;
@@ -28,8 +31,9 @@ Log.Logger = new LoggerConfiguration()
 
 builder.Host.UseSerilog();
 
-Console.WriteLine($"Environment: {builder.Environment.EnvironmentName}");
-Console.WriteLine($"Connection: {builder.Configuration.GetConnectionString("DefaultConnection")}");
+var env = builder.Environment.EnvironmentName;
+builder.Services.AddRedisCacheSupport(builder.Configuration, $"{env}:");
+builder.Services.AddScoped<ICacheAccessProvider, CacheAccessProvider>();
 
 // DB connection string (SQL Server example)
 builder.Services.AddDbContext<LoggingDbContext>(options =>
@@ -57,7 +61,14 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
-builder.Services.AddAuthorization();
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy(PolicyType.API_LEVEL, p =>
+    {
+        p.RequireAuthenticatedUser();
+        p.Requirements.Add(new PermissionRequirement("Api"));
+    });
+});
 
 
 builder.Services.AddHttpContextAccessor();
@@ -122,6 +133,8 @@ builder.Services.AddOpenTelemetry()
             o.Endpoint = new Uri($"http://{builder.Configuration["JAEGER_HOST"]}:4317"); // host -> docker            
             o.Protocol = OtlpExportProtocol.Grpc;
         }));
+
+builder.Services.AddScoped<IAuthorizationHandler, PermissionHandler>();
 
 var app = builder.Build();
 app.UseSerilogRequestLogging(); // structured request logs
