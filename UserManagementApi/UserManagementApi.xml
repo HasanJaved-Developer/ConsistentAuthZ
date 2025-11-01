@@ -22,5 +22,14 @@
         <member name="M:UserManagementApi.Migrations.InitialCreate.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
             <inheritdoc />
         </member>
+        <member name="T:UserManagementApi.Migrations.AddModuleTypeAndApiLogsSeed">
+            <inheritdoc />
+        </member>
+        <member name="M:UserManagementApi.Migrations.AddModuleTypeAndApiLogsSeed.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:UserManagementApi.Migrations.AddModuleTypeAndApiLogsSeed.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <inheritdoc />
+        </member>
     </members>
 </doc>

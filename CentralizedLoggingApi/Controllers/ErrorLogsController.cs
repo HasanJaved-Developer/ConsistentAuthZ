@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using CentralizedLogging.Contracts.Models;
 using CentralizedLogging.Contracts.DTO;
+using SharedLibrary.Auth;
 
 namespace CentralizedLoggingApi.Controllers
 {
@@ -61,7 +62,7 @@ namespace CentralizedLoggingApi.Controllers
             return Ok(error);
         }
 
-        [Authorize]
+        [Authorize(Policy = PolicyType.API_LEVEL)]
         // GET api/errorlogs
         [HttpGet]
         public async Task<IActionResult> GetAllErrors()

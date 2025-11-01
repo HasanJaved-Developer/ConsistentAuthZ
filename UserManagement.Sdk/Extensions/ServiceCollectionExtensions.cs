@@ -26,13 +26,6 @@ namespace UserManagement.Sdk.Extensions
             if (configure is not null)
                 services.PostConfigure(configure);
 
-            // Delegating handler MUST be transient
-            services.AddTransient<BearerTokenHandler>();
-
-            // Register the token provider (memory-based)
-            services.AddScoped<ICacheAccessProvider, CacheAccessProvider>();
-
-
             // The Typed client
             services.AddHttpClient<IUserManagementClient, UserManagementClient>((sp, http) =>
             {

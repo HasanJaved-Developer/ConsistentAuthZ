@@ -10,8 +10,8 @@ namespace SharedLibrary.Cache
     {
         Task<string?> GetAccessTokenAsync(CancellationToken ct = default);
         Task<string?> GetUserPermissionsAsync(CancellationToken ct = default);        
-        void SetAccessToken(string token, int userId, DateTime expiresAtUtc);
-        void SetUserPermissions(string permissions, int userId, DateTime expiresAtUtc);
+        Task SetAccessToken(string token, int userId, DateTime expiresAtUtc, CancellationToken ct = default);
+        Task SetUserPermissions(string permissions, int userId, DateTime expiresAtUtc, CancellationToken ct = default);
         public Task RemoveAsync(string userId, CancellationToken ct = default);
     }
 }
