@@ -43,19 +43,19 @@ namespace UserManagementApi.Migrations
                 -- Ensure Administration category exists
                 SELECT @catId = Id FROM Categories WHERE Name = 'Administration';
 
-                -- Ensure ApiLogs module exists (Area='', Controller='api', Action='errorlogs')
+                -- Ensure ApiLogs module exists (Area='', Controller='ErrorLogs', Action='GetAllErrors')
                 IF NOT EXISTS (
                     SELECT 1 FROM Modules 
-                    WHERE Name = 'ApiLogs' AND Controller = 'api' AND Action = 'errorlogs'
+                    WHERE Name = 'ApiLogs' AND Controller = 'ErrorLogs' AND Action = 'GetAllErrors'
                 )
                 BEGIN
                     INSERT INTO Modules ([Name],[Area],[Controller],[Action],[CategoryId],[Type])
-                    VALUES ('ApiLogs','', 'api','errorlogs', @catId, 'Api');
+                    VALUES ('ApiLogs','', 'ErrorLogs','GetAllErrors', @catId, 'Api');
                 END
 
                 DECLARE @modId INT;
                 SELECT @modId = Id FROM Modules 
-                WHERE Name='ApiLogs' AND Controller='api' AND Action='errorlogs';
+                WHERE Name='ApiLogs' AND Controller='ErrorLogs' AND Action='GetAllErrors';
 
                 -- Ensure function Api.Logs.View exists
                 IF NOT EXISTS (SELECT 1 FROM Functions WHERE [Code] = 'Api.Logs.View')
@@ -79,7 +79,7 @@ namespace UserManagementApi.Migrations
             migrationBuilder.Sql(@"
                 DELETE M
                 FROM Modules M
-                WHERE M.[Name] = 'ApiLogs' AND M.[Controller] = 'api' AND M.[Action] = 'errorlogs';
+                WHERE M.[Name] = 'ApiLogs' AND M.[Controller] = 'ErrorLogs' AND M.[Action] = 'GetAllErrors';
             ");
             
             // Drop the Type column

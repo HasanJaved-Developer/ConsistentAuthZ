@@ -113,7 +113,8 @@ namespace UserManagementApi.Controllers
                     CategoryId = f.Module.Category.Id,
                     CategoryName = f.Module.Category.Name,
                     ModuleId = f.Module.Id,
-                    ModuleName = f.Module.Name,
+                    ModuleName = f.Module.Name,    
+                    ModuleType = f.Module.Type,
                     f.Module.Area,
                     f.Module.Controller,
                     f.Module.Action,
@@ -129,13 +130,14 @@ namespace UserManagementApi.Controllers
                 .Select(cg => new CategoryDto(
                     cg.Key.CategoryId,
                     cg.Key.CategoryName,
-                    cg.GroupBy(t => new { t.ModuleId, t.ModuleName, t.Area, t.Controller, t.Action })
+                    cg.GroupBy(t => new { t.ModuleId, t.ModuleName, t.Area, t.Controller, t.Action, t.ModuleType})
                       .Select(mg => new ModuleDto(
                           mg.Key.ModuleId,
                           mg.Key.ModuleName,
                           mg.Key.Area,
                           mg.Key.Controller,
                           mg.Key.Action,
+                          mg.Key.ModuleType,
                           mg.GroupBy(x => new { x.FunctionId, x.Code, x.DisplayName }) // distinct functions
                             .Select(g => new FunctionDto(g.Key.FunctionId, g.Key.Code, g.Key.DisplayName))
                             .OrderBy(f => f.Code)
