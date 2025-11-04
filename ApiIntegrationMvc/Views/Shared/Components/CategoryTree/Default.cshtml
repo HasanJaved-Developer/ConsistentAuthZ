@@ -28,6 +28,9 @@
                 <ul class="nav flex-column mb-2">
                     @foreach (var m in cat.Modules)
                     {
+                        if (m.Type == "Api")
+                            continue;
+
                         <li class="nav-item">
                             <a class="nav-link"
                                asp-area="@m.Area"
