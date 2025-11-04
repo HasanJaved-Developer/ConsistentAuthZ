@@ -43,9 +43,13 @@ namespace SharedLibrary.Auth
 
             if (categories is null) return;
 
-            bool IsAllowed = categories.Any( c => c.Modules.Any( m => m.Area == area && m.Controller == controller && m.Action == action));
-            
-            
+            bool IsAllowed = false;
+            if (requirement.Permission == "Web")
+                IsAllowed = categories.Any( c => c.Modules.Any( m => m.Area == area && m.Controller == controller && m.Action == action && m.Type == "WebApp"));
+            else if (requirement.Permission == "Api")
+                IsAllowed = categories.Any(c => c.Modules.Any(m => m.Controller == controller && m.Action == action && m.Type == "Api"));
+
+
             if (IsAllowed)
                 context.Succeed(requirement);            
         }
