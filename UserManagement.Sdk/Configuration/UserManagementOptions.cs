@@ -12,7 +12,7 @@ namespace UserManagement.Sdk.Configuration
         public Uri? BaseAddress { get; set; }
 
         /// <summary>HttpClient timeout (default 30s).</summary>
-        public TimeSpan Timeout { get; set; } = TimeSpan.FromSeconds(30);
+        public TimeSpan Timeout { get; set; } = TimeSpan.FromMinutes(2);
 
         /// <summary>Enable Polly resilience policies.</summary>
         public bool EnableResiliencePolicies { get; set; } = true;
