@@ -64,6 +64,29 @@ namespace UserManagementApi.Migrations
                     VALUES ('Api.Logs.View','Api View Logs', @modId);
                 END
             ");
+
+    
+            // add allan if missing (hash created here once & inlined)
+            var hash = BCrypt.Net.BCrypt.HashPassword("allan");
+            migrationBuilder.Sql($@"
+                IF NOT EXISTS (SELECT 1 FROM [Users] WHERE [UserName]='allan')
+                BEGIN
+                    INSERT INTO [Users]([UserName],[Password]) VALUES ('allan','{hash}');
+                END
+            ");
+
+            // link allan ↔ Operator if missing
+            migrationBuilder.Sql(@"
+                DECLARE @uid INT = (SELECT TOP 1 [Id] FROM [Users] WHERE [UserName]='allan');
+                DECLARE @rid INT = (SELECT TOP 1 [Id] FROM [Roles] WHERE [Name]='Admin');
+
+                IF @uid IS NOT NULL AND @rid IS NOT NULL
+                AND NOT EXISTS(SELECT 1 FROM [UserRoles] WHERE [UserId]=@uid AND [RoleId]=@rid)
+                BEGIN
+                    INSERT INTO [UserRoles]([UserId],[RoleId]) VALUES (@uid,@rid);
+                END
+            ");
+
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -87,6 +110,16 @@ namespace UserManagementApi.Migrations
                 name: "Type",
                 table: "Modules"
             );
+
+            // Remove allan user and its roles
+            migrationBuilder.Sql(@"
+                DECLARE @uid INT = (SELECT TOP 1 [Id] FROM [Users] WHERE [UserName]='allan');
+                IF @uid IS NOT NULL
+                BEGIN
+                    DELETE FROM [UserRoles] WHERE [UserId]=@uid;
+                    DELETE FROM [Users] WHERE [Id]=@uid;
+                END
+            ");
         }
 
     }
