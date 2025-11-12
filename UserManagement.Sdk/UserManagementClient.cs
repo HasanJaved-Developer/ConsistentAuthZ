@@ -39,5 +39,58 @@ namespace UserManagement.Sdk
             var auth = JsonSerializer.Deserialize<AuthResponse>(body, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
             return auth;
         }
+
+        public async Task<UpdatePermissionsResponse> UpdatePermissions(UpdatePermissionsRequest operations, CancellationToken ct = default)
+        {
+            var resp = await _http.PostAsJsonAsync("api/users/updatepermissions", operations, ct);
+
+            resp.EnsureSuccessStatusCode(); // throw if failed
+
+            // if you expect a structured response, deserialize it
+            var result = await resp.Content.ReadAsStringAsync(ct);
+            if (!resp.IsSuccessStatusCode)
+            {
+                throw new HttpRequestException($"Failed to update permissions: {result}");
+            }
+            else
+            {
+                return new UpdatePermissionsResponse(result);
+            }
+
+        }
+
+        public async Task<UserPermissionsDto> GetPermissions(int userId, CancellationToken ct = default)
+        {
+            var resp = await _http.GetAsync($"api/users/{userId}/permissions", ct);
+
+            resp.EnsureSuccessStatusCode();
+
+            return await resp.Content.ReadFromJsonAsync<UserPermissionsDto>(cancellationToken: ct);
+
+        }
+
+        public async Task<object> GetState(int userId, CancellationToken ct = default)
+        {
+            var resp = await _http.GetAsync($"api/users/{userId}/getstate", ct);
+
+            // Throws if 4xx/5xx
+            resp.EnsureSuccessStatusCode();
+
+            // Read JSON
+            var json = await resp.Content.ReadAsStringAsync(ct);
+
+            // Optional extra defensive check
+            if (!resp.IsSuccessStatusCode)
+                throw new HttpRequestException($"Failed to fetch permissions for user {userId}: {json}");
+
+            // Deserialize to your DTO
+            var dto = System.Text.Json.JsonSerializer.Deserialize<object>(json);
+
+            // Safety check (should not happen unless server returns null JSON)
+            if (dto == null)
+                throw new InvalidOperationException($"Empty or invalid permissions payload for user {userId}.");
+
+            return dto;
+        }
     }
 }
