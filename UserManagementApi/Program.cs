@@ -6,6 +6,7 @@ using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using Serilog;
 using SharedLibrary;
+using SharedLibrary.Cache;
 using SharedLibrary.Middlewares;
 using System.Reflection;
 using System.Text;
@@ -25,8 +26,10 @@ Log.Logger = new LoggerConfiguration()
 
 builder.Host.UseSerilog();
 
-Console.WriteLine($"Environment: {builder.Environment.EnvironmentName}");
-Console.WriteLine($"Connection: {builder.Configuration.GetConnectionString("DefaultConnection")}");
+var env = builder.Environment.EnvironmentName;
+builder.Services.AddRedisCacheSupport(builder.Configuration, $"{env}:");
+
+builder.Services.AddScoped<ICacheAccessProvider, CacheAccessProvider>();
 
 // DB connection string (SQL Server example)
 builder.Services.AddDbContext<AppDbContext>(options =>
@@ -59,7 +62,7 @@ builder.Services.AddAuthorization();
 builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddControllersWithViews();
-builder.Services.AddMemoryCache();
+
 
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddEndpointsApiExplorer();
