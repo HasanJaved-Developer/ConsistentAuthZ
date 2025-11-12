@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using SharedLibrary.Cache;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -11,6 +12,7 @@ using UserManagement.Contracts.DTO;
 using UserManagementApi.Contracts.Models;
 using UserManagementApi.Data;
 using UserManagementApi.DTO.Auth;
+using static System.Net.WebRequestMethods;
 
 
 namespace UserManagementApi.Controllers
@@ -20,14 +22,12 @@ namespace UserManagementApi.Controllers
     [Route("api/users")]
     public class UsersController : ControllerBase
     {
+        private readonly ICacheAccessProvider _cache;
         private readonly AppDbContext _db;
         private readonly JwtOptions _jwt;
 
-        public UsersController(AppDbContext db, IOptions<JwtOptions> jwtOptions)
-        {
-            _db = db;
-            _jwt = jwtOptions.Value;
-        }
+        public UsersController(ICacheAccessProvider cache, AppDbContext db, IOptions<JwtOptions> jwtOptions) => (_cache, _db, _jwt) = (cache, db, jwtOptions.Value);
+        
         // --------- NEW: POST /api/users/authenticate ----------
         [HttpPost("authenticate")]
         [ProducesResponseType(typeof(AuthResponse), StatusCodes.Status200OK)]
@@ -70,15 +70,58 @@ namespace UserManagementApi.Controllers
             var dto = await BuildPermissionsForUser(user.Id);
                         
             var token = GenerateJwt(user, out var expiresAtUtc);
-                       
-            return Ok(new AuthResponse(user.Id, user.UserName, token, expiresAtUtc, dto.Categories));
+
+            var role = user?.UserRoles.Select(ur => ur.Role.Name).FirstOrDefault();
+
+            return Ok(new AuthResponse(user.Id, user.UserName, token, role, expiresAtUtc, dto.Categories));
+        }
+
+        [HttpPost("updatepermissions")]
+        [ProducesResponseType(typeof(AuthResponse), StatusCodes.Status200OK)]
+        public async Task<ActionResult<AuthResponse>> UpdatePermissions([FromBody] UpdatePermissionsRequest operation)
+        {
+            var admin = await _db.Roles.Where(r => r.Name == "Admin").FirstOrDefaultAsync();
+            var webfunction = await _db.Functions.Where(r => r.Code == "Logs.View").FirstOrDefaultAsync();
+            var apifunction = await _db.Functions.Where(r => r.Code == "Api.Logs.View").FirstOrDefaultAsync();
+
+            bool hasWebAccess = _db.RoleFunctions.Any(rf => rf.FunctionId == webfunction.Id && rf.RoleId == admin.Id);
+            bool hasApiAccess = _db.RoleFunctions.Any(rf => rf.FunctionId == apifunction.Id && rf.RoleId == admin.Id);
+
+            if (operation.Op == "grant-webapp" && !hasWebAccess)
+            {                
+                await _db.RoleFunctions.AddAsync(new RoleFunction() { RoleId = admin.Id, FunctionId = webfunction.Id});                
+            }
+            if (operation.Op == "grant-api" && !hasApiAccess)
+            {
+                await _db.RoleFunctions.AddAsync(new RoleFunction() { RoleId = admin.Id, FunctionId = apifunction.Id });
+            }
+            if (operation.Op == "revoke-api" && hasApiAccess)
+            {
+                _db.RoleFunctions.Remove(new RoleFunction() { RoleId = admin.Id, FunctionId = apifunction.Id });
+            }
+            if (operation.Op == "revoke-both")
+            {
+                if (hasWebAccess)
+                    _db.RoleFunctions.Remove(new RoleFunction() { RoleId = admin.Id, FunctionId = webfunction.Id });
+                if (hasApiAccess)
+                    _db.RoleFunctions.Remove(new RoleFunction() { RoleId = admin.Id, FunctionId = apifunction.Id });
+            }
+            // save once (only if something changed)
+            if (_db.ChangeTracker.HasChanges())
+            {
+                var affected = await _db.SaveChangesAsync();                
+            }
+            
+            long cacheresult = await _cache.InvalidatePermissionsForRoleAsync("Admin");
+
+            return Ok(new { Message = $"Permissions updated with operation: {operation.Op}" });
         }
 
         // --------- (Existing) GET /api/users/{userId}/permissions ----------
         // Now protected by JWT; call with Bearer token returned by /authenticate
         [Authorize]
         [HttpGet("{userId:int}/permissions")]
-        public async Task<ActionResult<UserPermissionsDto>> GetPermissions(int userId)
+        public async Task<ActionResult> GetPermissions(int userId)
         {
             // Optional: you can enforce that a user can only view their own permissions
             // by comparing userId with the token's sub, if desired.
@@ -88,6 +131,24 @@ namespace UserManagementApi.Controllers
 
             var dto = await BuildPermissionsForUser(userId);
             return Ok(dto);
+        }
+
+        [Authorize]
+        [HttpGet("{userId:int}/getstate")]
+        public async Task<object> GetStateAsync(int userId)
+        {
+            var admin = await _db.Roles.Where(r => r.Name == "Admin").FirstOrDefaultAsync();
+            var webfunction = await _db.Functions.Where(r => r.Code == "Logs.View").FirstOrDefaultAsync();
+            var apifunction = await _db.Functions.Where(r => r.Code == "Api.Logs.View").FirstOrDefaultAsync();
+
+            bool hasWebAccess = _db.RoleFunctions.Any(rf => rf.FunctionId == webfunction.Id && rf.RoleId == admin.Id);
+            bool hasApiAccess = _db.RoleFunctions.Any(rf => rf.FunctionId == apifunction.Id && rf.RoleId == admin.Id);
+
+            return new
+            {
+                webapp = hasWebAccess,
+                api = hasApiAccess
+            };
         }
 
         // ----- helpers -----
@@ -159,11 +220,11 @@ namespace UserManagementApi.Controllers
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(keyPlain));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-
+                        
             var claims = new List<Claim>
             {
                 new(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
-                new(JwtRegisteredClaimNames.UniqueName, user.UserName)
+                new(JwtRegisteredClaimNames.UniqueName, user.UserName)                
             };
             
             var now = DateTime.UtcNow;
@@ -179,5 +240,7 @@ namespace UserManagementApi.Controllers
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
+
+        
     }
 }
