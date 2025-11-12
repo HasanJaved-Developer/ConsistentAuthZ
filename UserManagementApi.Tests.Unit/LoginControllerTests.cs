@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Moq;
+using SharedLibrary.Cache;
 using UserManagement.Contracts.DTO;
 using UserManagementApi.Data;
 using UserManagementApi.DTO;
@@ -13,6 +14,7 @@ namespace UserManagementApi.Tests.Unit
 {
     public class LoginControllerTests
     {
+        private readonly ICacheAccessProvider _cache;
         private static AppDbContext NewDb(string name)
         {
             var opts = new DbContextOptionsBuilder<AppDbContext>()
@@ -33,7 +35,7 @@ namespace UserManagementApi.Tests.Unit
             };
             var wrapped = Options.Create(jwtOptions); // returns IOptions<JwtOptions>
 
-            var controller = new TestableLoginController(db, wrapped);
+            var controller = new TestableLoginController(_cache, db, wrapped);
 
             var res = await controller.Authenticate(new LoginRequest("", ""));
 
