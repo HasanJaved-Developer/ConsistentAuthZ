@@ -1,18 +1,40 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.Hosting;
+
+using StackExchange.Redis;
+using System.Data;
+using System.Diagnostics;
+using System.Security;
 using System.Security.Claims;
+using System.Text.Json;
+using UserManagementApi.Contracts.Models;
 
 namespace SharedLibrary.Cache
 {
     public sealed class CacheAccessProvider : ICacheAccessProvider
     {
+        private readonly IDatabase _db;
         private readonly IDistributedCache _cache;
         private readonly IHttpContextAccessor _http;        
+        private readonly string _envPrefix;
+        public CacheAccessProvider(IDatabase db, IDistributedCache cache, IHttpContextAccessor http, IHostEnvironment env) => (_db, _cache, _http, _envPrefix) = (db, cache, http, 
+            string.IsNullOrWhiteSpace(env.EnvironmentName) ? "" : env.EnvironmentName + ":");
 
-        public CacheAccessProvider(IDistributedCache cache, IHttpContextAccessor http)
+        private string K(string key) => _envPrefix + key;
+
+        public async Task<long> InvalidatePermissionsForRoleAsync(string roleName, CancellationToken ct = default)
         {
-            _cache = cache;
-            _http = http;
+            
+            var members = await _db.SetMembersAsync(K($"auth:roleusers:{roleName}"));
+            if (members.Length == 0)
+                return 0;
+            
+            var keys = members
+                .Select(m => (RedisKey)K($"auth:permissions:{(int)m}"))
+                .ToArray();
+
+            return await _db.KeyDeleteAsync(keys);
         }
 
         public async Task<string?> GetAccessTokenAsync(CancellationToken ct = default)
@@ -26,8 +48,7 @@ namespace SharedLibrary.Cache
 
             var key = $"auth:token:{uid}";
             var token = await _cache.GetStringAsync(key, ct);
-            return token;
-            
+            return token;            
         }
 
         public async Task<string?> GetUserPermissionsAsync(CancellationToken ct = default)
@@ -39,9 +60,9 @@ namespace SharedLibrary.Cache
 
             if (string.IsNullOrEmpty(uid)) return null;
 
-            var key = $"auth:permissions:{uid}";
-            var permissions = await _cache.GetStringAsync(key, ct);
-            return permissions;
+            var dataKey = K($"auth:permissions:{uid}");
+            return await _db.StringGetAsync(dataKey);
+            
         }
 
         // Optional helper method to set the token into cache
@@ -60,7 +81,7 @@ namespace SharedLibrary.Cache
             await _cache.SetStringAsync(key, token, options, ct);
         }
 
-        public async Task SetUserPermissions(string permissions, int userId, DateTime expiresAtUtc, CancellationToken ct = default)
+        public async Task<bool> SetUserInRoleSet(string roleName, int userId, DateTime expiresAtUtc, CancellationToken ct = default)
         {
             var ttl = ToTtl(expiresAtUtc);
 
@@ -70,15 +91,26 @@ namespace SharedLibrary.Cache
             };
 
             // IMPORTANT: Do not manually prefix here if using InstanceName in startup.
-            var key = $"auth:permissions:{userId}";
+            var usersForRoleKey = K($"auth:roleusers:{roleName}");
 
-            await _cache.SetStringAsync(key, permissions, options, ct);
+            bool added = await _db.SetAddAsync(usersForRoleKey, userId);
+            return added;
         }
 
+        public async Task SetUserPermissions(string permissions, int userId, DateTime expiresAtUtc, CancellationToken ct = default)
+        {
+            var ttl = ToTtl(expiresAtUtc);
+            
+            // IMPORTANT: Do not manually prefix here if using InstanceName in startup.
+            var key = K($"auth:permissions:{userId}");            
+            await _db.StringSetAsync(key, permissions, ttl);
+            
+        }
+        
+        //User Logout
         public Task RemoveAsync(string userId, CancellationToken ct = default)
         {   
-            _cache.Remove($"auth:token:{userId}");
-            _cache.Remove($"auth:permissions:{userId}");
+            _cache.Remove($"auth:token:{userId}");            
             return Task.CompletedTask;
         }
 
