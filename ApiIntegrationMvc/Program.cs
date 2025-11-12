@@ -1,4 +1,5 @@
 using ApiIntegrationMvc;
+using ApiIntegrationMvc.Middlewares;
 using CentralizedLogging.Sdk.Extensions;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
@@ -12,6 +13,7 @@ using SharedLibrary;
 using SharedLibrary.Auth;
 using SharedLibrary.Auths;
 using SharedLibrary.Cache;
+using StackExchange.Redis;
 using UserManagement.Sdk.Extensions;
 
 
@@ -49,7 +51,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
     {
         o.LoginPath = "/Account/Login";
         o.LogoutPath = "/Account/Logout";
-        o.AccessDeniedPath = "/Account/Denied";
+        o.AccessDeniedPath = "/Home/Home/Denied";
         // optional:
         o.SlidingExpiration = true;
         o.ExpireTimeSpan = TimeSpan.FromHours(8);
@@ -80,7 +82,6 @@ builder.Services.AddOpenTelemetry()
 
 builder.Services.AddScoped<IAuthorizationHandler, PermissionHandler>();
 
-
 var app = builder.Build();
 app.UseSerilogRequestLogging(); // structured request logs
 
@@ -100,6 +101,7 @@ app.UseStaticFiles();
 app.UseRouting();
 
 app.UseAuthentication();
+app.UseMiddleware<EnsurePermissionsCachedMiddleware>();
 app.UseAuthorization();
 
 app.MapControllerRoute(
