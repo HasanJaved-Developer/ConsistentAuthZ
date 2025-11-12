@@ -1,4 +1,5 @@
 using ApiIntegrationMvc.Areas.Account.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SharedLibrary.Cache;
 using System.Collections.Generic;
@@ -19,7 +20,7 @@ namespace ApiIntegrationMvc.Areas.Home.Controllers
 
 
         public HomeController(ICacheAccessProvider tokens) => _tokens = tokens;
-       
+                
         public IActionResult Index(CancellationToken ct)
         {            
             return View();
@@ -31,9 +32,13 @@ namespace ApiIntegrationMvc.Areas.Home.Controllers
             return View();
         }
 
+        public IActionResult Denied()
+        {
+            TempData["Toast"] = "Your permissions have been updated.";
+            return RedirectToAction("Index", "Home", new { area = "Home" });
+        }
 
 
-       
 
     }
 }
