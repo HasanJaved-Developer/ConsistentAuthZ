@@ -51,7 +51,11 @@ namespace SharedLibrary.Auth
 
 
             if (IsAllowed)
-                context.Succeed(requirement);            
+                context.Succeed(requirement);
+            else
+            {
+                context.Fail();
+            }
         }
     }
 }
