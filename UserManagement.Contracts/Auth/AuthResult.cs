@@ -6,6 +6,7 @@ namespace UserManagement.Contracts.Auth
       int UserId,
       string UserName,
       string Token,
+      string role,
       DateTime ExpiresAtUtc,
       List<CategoryDto> Categories
   );
