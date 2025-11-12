@@ -4,8 +4,11 @@ using CentralizedLogging.Sdk.Abstractions;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 using SharedLibrary.Cache;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Text;
 using System.Text.Json;
 using UserManagement.Contracts.DTO;
 using UserManagement.Sdk.Abstractions;
@@ -29,7 +32,7 @@ namespace ApiIntegrationMvc.Areas.Account.Controllers
             ViewBag.Error = TempData["Error"];     // one-time error
             return View(new LoginViewModel());     // empty fields
         }
-
+        
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Index(LoginViewModel model, CancellationToken ct)
@@ -40,7 +43,7 @@ namespace ApiIntegrationMvc.Areas.Account.Controllers
                 {
                     return View(model);
                 }
-
+                
                 var req = new LoginRequest(model.Username, model.Password);
                 var result = await _users.LoginAsync(req, ct);
 
@@ -56,7 +59,8 @@ namespace ApiIntegrationMvc.Areas.Account.Controllers
                 {
                     new(ClaimTypes.NameIdentifier, result.UserId.ToString()),
                     new(ClaimTypes.Name, result.UserName),
-                  
+                    new(ClaimTypes.Role, result.role),
+
                 };
 
                 var identity = new ClaimsIdentity(
@@ -74,10 +78,11 @@ namespace ApiIntegrationMvc.Areas.Account.Controllers
                     });
 
                 
-                _cache.SetAccessToken(result.Token, result.UserId, result.ExpiresAtUtc);
+                await _cache.SetAccessToken(result.Token, result.UserId, result.ExpiresAtUtc);
+                await _cache.SetUserInRoleSet(result.role, result.UserId, result.ExpiresAtUtc);
 
                 var categoriesJson = System.Text.Json.JsonSerializer.Serialize(result.Categories);
-                _cache.SetUserPermissions(categoriesJson, result.UserId, result.ExpiresAtUtc);
+                await _cache.SetUserPermissions(categoriesJson, result.UserId, result.ExpiresAtUtc);
 
                 return RedirectToAction("Index", "Home", new { area = "Home" });
             }
@@ -136,6 +141,7 @@ namespace ApiIntegrationMvc.Areas.Account.Controllers
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             return RedirectToAction("Index", "Login", new { area = "Account" });
         }
+
 
 
     }
