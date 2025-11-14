@@ -1,21 +1,21 @@
 # 🛰️ ConsistentAuthZ — Distributed-ready centralized authorization with Redis and stale-claim-safe live permission updates.
 
-[![Build](https://github.com/hasanjaved-developer/ConsistentAuthZ/actions/workflows/dotnet-tests.yml/badge.svg?branch=v1.0.3)](https://github.com/hasanjaved-developer/CentralizedLoggingMonitoring/actions/workflows/dotnet-tests.yml)
+[![Build](https://github.com/hasanjaved-developer/ConsistentAuthZ/actions/workflows/dotnet-tests.yml/badge.svg?branch=v1.0.1)](https://github.com/hasanjaved-developer/ConsistentAuthZ/actions/workflows/dotnet-tests.yml)
 [![codecov](https://codecov.io/gh/hasanjaved-developer/ConsistentAuthZ/branch/master/graph/badge.svg)](https://codecov.io/gh/hasanjaved-developer/ConsistentAuthZ)
 [![Docker Compose CI](https://github.com/hasanjaved-developer/ConsistentAuthZ/actions/workflows/docker-compose-ci.yml/badge.svg)](https://github.com/hasanjaved-developer/ConsistentAuthZ/actions/workflows/docker-compose-ci.yml)
 [![License](https://img.shields.io/github/license/hasanjaved-developer/ConsistentAuthZ)](LICENSE.txt)
 [![Release](https://img.shields.io/github/v/tag/hasanjaved-developer/ConsistentAuthZ?label=release&sort=semver)](https://github.com/hasanjaved-developer/ConsistentAuthZ/tags)
-[![GHCR api](https://img.shields.io/badge/ghcr.io-centralized--logging%2Fapi-blue?logo=github)](https://ghcr.io/hasanjaved-developer/consistent-authz/api)
-[![GHCR userapi](https://img.shields.io/badge/ghcr.io-centralized--logging%2Fuserapi-blue?logo=github)](https://ghcr.io/hasanjaved-developer/consistent-authz/userapi)
-[![GHCR web](https://img.shields.io/badge/ghcr.io-centralized--logging%2Fweb-blue?logo=github)](https://ghcr.io/hasanjaved-developer/consistent-authz/web)
+[![GHCR api](https://img.shields.io/badge/ghcr.io-consistent--authz%2Fapi-blue?logo=github)](https://ghcr.io/hasanjaved-developer/consistent-authz/api)
+[![GHCR userapi](https://img.shields.io/badge/ghcr.io-consistent--authz%2Fuserapi-blue?logo=github)](https://ghcr.io/hasanjaved-developer/consistent-authz/userapi)
+[![GHCR web](https://img.shields.io/badge/ghcr.io-consistent--authz%2Fweb-blue?logo=github)](https://ghcr.io/hasanjaved-developer/consistent-authz/web)
 
 ### 🐳 Docker Hub Images
 
 | Service | Pulls | Size | Version |
 |----------|-------|------|----------|
-| **API** | [![Pulls](https://img.shields.io/docker/pulls/hasanjaveddeveloper/consistent-authz-api)](https://hub.docker.com/r/hasanjaveddeveloper/consistent-authz-api) | [![Size](https://img.shields.io/docker/image-size/hasanjaveddeveloper/consistent-authz-api/v1.0.3)](https://hub.docker.com/r/hasanjaveddeveloper/consistent-authz-api/tags) | [![Version](https://img.shields.io/docker/v/hasanjaveddeveloper/consistent-authz-api?sort=semver)](https://hub.docker.com/r/hasanjaveddeveloper/consistent-authz-api/tags) |
-| **User API** | [![Pulls](https://img.shields.io/docker/pulls/hasanjaveddeveloper/consistent-authz-userapi)](https://hub.docker.com/r/hasanjaveddeveloper/consistent-authz-userapi) | [![Size](https://img.shields.io/docker/image-size/hasanjaveddeveloper/consistent-authz-userapi/v1.0.3)](https://hub.docker.com/r/hasanjaveddeveloper/consistent-authz-userapi/tags) | [![Version](https://img.shields.io/docker/v/hasanjaveddeveloper/consistent-authz-userapi?sort=semver)](https://hub.docker.com/r/hasanjaveddeveloper/consistent-authz-userapi/tags) |
-| **Web (Portal)** | [![Pulls](https://img.shields.io/docker/pulls/hasanjaveddeveloper/consistent-authz-web)](https://hub.docker.com/r/hasanjaveddeveloper/consistent-authz-web) | [![Size](https://img.shields.io/docker/image-size/hasanjaveddeveloper/consistent-authz-web/v1.0.3)](https://hub.docker.com/r/hasanjaveddeveloper/consistent-authz-web/tags) | [![Version](https://img.shields.io/docker/v/hasanjaveddeveloper/consistent-authz-web?sort=semver)](https://hub.docker.com/r/hasanjaveddeveloper/consistent-authz-web/tags) |
+| **API** | [![Pulls](https://img.shields.io/docker/pulls/hasanjaveddeveloper/consistent-authz-api)](https://hub.docker.com/r/hasanjaveddeveloper/consistent-authz-api) | [![Size](https://img.shields.io/docker/image-size/hasanjaveddeveloper/consistent-authz-api/v1.0.1)](https://hub.docker.com/r/hasanjaveddeveloper/consistent-authz-api/tags) | [![Version](https://img.shields.io/docker/v/hasanjaveddeveloper/consistent-authz-api?sort=semver)](https://hub.docker.com/r/hasanjaveddeveloper/consistent-authz-api/tags) |
+| **User API** | [![Pulls](https://img.shields.io/docker/pulls/hasanjaveddeveloper/consistent-authz-userapi)](https://hub.docker.com/r/hasanjaveddeveloper/consistent-authz-userapi) | [![Size](https://img.shields.io/docker/image-size/hasanjaveddeveloper/consistent-authz-userapi/v1.0.1)](https://hub.docker.com/r/hasanjaveddeveloper/consistent-authz-userapi/tags) | [![Version](https://img.shields.io/docker/v/hasanjaveddeveloper/consistent-authz-userapi?sort=semver)](https://hub.docker.com/r/hasanjaveddeveloper/consistent-authz-userapi/tags) |
+| **Web (Portal)** | [![Pulls](https://img.shields.io/docker/pulls/hasanjaveddeveloper/consistent-authz-web)](https://hub.docker.com/r/hasanjaveddeveloper/consistent-authz-web) | [![Size](https://img.shields.io/docker/image-size/hasanjaveddeveloper/consistent-authz-web/v1.0.1)](https://hub.docker.com/r/hasanjaveddeveloper/consistent-authz-web/tags) | [![Version](https://img.shields.io/docker/v/hasanjaveddeveloper/consistent-authz-web?sort=semver)](https://hub.docker.com/r/hasanjaveddeveloper/consistent-authz-web/tags) |
 
 This project demonstrates **consistent authorization between a Web App and APIs,** backed by **Redis-cached permissions** and **automatic refresh on role change,** without forcing user logout.
 
