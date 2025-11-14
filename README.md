@@ -3,7 +3,7 @@
 [![Build](https://github.com/hasanjaved-developer/ConsistentAuthZ/actions/workflows/dotnet-tests.yml/badge.svg?branch=v1.0.1)](https://github.com/hasanjaved-developer/ConsistentAuthZ/actions/workflows/dotnet-tests.yml)
 [![codecov](https://codecov.io/gh/hasanjaved-developer/ConsistentAuthZ/branch/master/graph/badge.svg)](https://codecov.io/gh/hasanjaved-developer/ConsistentAuthZ)
 [![Docker Compose CI](https://github.com/hasanjaved-developer/ConsistentAuthZ/actions/workflows/docker-compose-ci.yml/badge.svg)](https://github.com/hasanjaved-developer/ConsistentAuthZ/actions/workflows/docker-compose-ci.yml)
-[![License](https://img.shields.io/github/license/hasanjaved-developer/ConsistentAuthZ)](LICENSE.txt)
+[![License](https://img.shields.io/badge/License-MIT-blue?logo=github)](LICENSE.txt)
 [![Release](https://img.shields.io/github/v/tag/hasanjaved-developer/ConsistentAuthZ?label=release&sort=semver)](https://github.com/hasanjaved-developer/ConsistentAuthZ/tags)
 [![GHCR api](https://img.shields.io/badge/ghcr.io-consistent--authz%2Fapi-blue?logo=github)](https://ghcr.io/hasanjaved-developer/consistent-authz/api)
 [![GHCR userapi](https://img.shields.io/badge/ghcr.io-consistent--authz%2Fuserapi-blue?logo=github)](https://ghcr.io/hasanjaved-developer/consistent-authz/userapi)
