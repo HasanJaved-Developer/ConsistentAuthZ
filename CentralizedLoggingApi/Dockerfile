@@ -4,6 +4,7 @@ WORKDIR /src
 
 # Copy CentralizedLoggingApi + the SDKs it depends on
 COPY CentralizedLogging.Contracts/CentralizedLogging.Contracts.csproj CentralizedLogging.Contracts/
+COPY UserManagement.Contracts/UserManagement.Contracts.csproj UserManagement.Contracts/
 COPY SharedLibrary/SharedLibrary.csproj SharedLibrary/
 COPY CentralizedLoggingApi/CentralizedLoggingApi.csproj CentralizedLoggingApi/
 
