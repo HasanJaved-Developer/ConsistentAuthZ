@@ -22,7 +22,10 @@ This project demonstrates **consistent authorization between a Web App and APIs,
 It runs as a **single-node, modular application**, but follows a **distributed-ready design** with clear service boundaries and optional RabbitMQ support for future event-driven scaling.
 
 **Key Idea:**
-UI and API must always agree on what the user can do — authorization should be a system capability, not scattered checks.
+Keep UI and API aligned — centralize authorization to avoid scattered permission checks.
+
+**Demo Admin Account:** 
+allan / allan — useful for testing permissions in multiple browsers with shared cache.
 
 ---
 
