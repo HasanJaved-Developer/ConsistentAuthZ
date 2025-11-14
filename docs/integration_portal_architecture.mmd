@@ -27,11 +27,11 @@ flowchart TB
   UDB[(🗄️ User DB)]:::db
   LDB[(🗄️ Logging DB)]:::db
 
+  %% --- Distributed Cache ---
+  DRAGONFLY[(🧠 DragonflyDB<br/>Cache: Tokens · Permissions · Roles)]:::cache
+
   %% --- Shared Observability Library ---
   SHARED[🧰 Shared.Observability<br/>Middlewares<br/>ActivityTraceEnricher]:::lib
-
- 
-
 
   %% --- Flows ---
   %% Clients use SDKs
@@ -50,6 +50,11 @@ flowchart TB
   UM_API --> UDB
   LOG_API --> LDB
 
+  %% APIs use DragonflyDB cache
+  UM_API --> DRAGONFLY
+  LOG_API --> DRAGONFLY
+  Portal --> DRAGONFLY
+
   %% APIs use Shared Library (middlewares + enricher)
   UM_API -. uses .-> SHARED
   LOG_API -. uses .-> SHARED
@@ -64,9 +69,9 @@ flowchart TB
   classDef client fill:#f0f8ff,stroke:#007acc,stroke-width:2px,color:#000,font-weight:bold;
   classDef sdk fill:#fff5e6,stroke:#ff9900,stroke-width:2px,color:#000;
   classDef api fill:#e6ffe6,stroke:#339933,stroke-width:2px,color:#000;
-  classDef contract fill:#f9f9f9,stroke:#555555,stroke-dasharray: 3 3,color:#000;
+  classDef contract fill:#f9f9f9,stroke:#555555,stroke-dasharray:3 3,color:#000;
   classDef db fill:#fff0f5,stroke:#cc0066,stroke-width:2px,color:#000;
-  
+  classDef cache fill:#f5f0ff,stroke:#7b2cbf,stroke-width:2px,color:#000,font-weight:bold;
   classDef lib fill:#eef7ff,stroke:#2b6cb0,stroke-width:2px,color:#000;
   classDef otel fill:#fffbea,stroke:#b7791f,stroke-width:2px,color:#000;
   classDef infra fill:#f5f5ff,stroke:#6b46c1,stroke-width:2px,color:#000;
