@@ -14,6 +14,8 @@ services:
         condition: service_healthy
       jaeger:
         condition: service_started
+      dragonfly:
+        condition: service_started
     volumes:
       - ./CentralizedLoggingApi/logs:/app/logs   
 
@@ -31,6 +33,8 @@ services:
       db:
         condition: service_healthy
       jaeger:
+        condition: service_started
+      dragonfly:
         condition: service_started
     volumes:
       - ./UserManagementApi/logs:/app/logs    
@@ -54,6 +58,8 @@ services:
       userapi:
         condition: service_started
       jaeger:
+        condition: service_started
+      dragonfly:
         condition: service_started
 
   db:
@@ -84,5 +90,17 @@ services:
     environment:
       - LOG_LEVEL=info
 
+  dragonfly:
+    image: docker.dragonflydb.io/dragonflydb/dragonfly:v1.24.0
+    container_name: dragonfly
+    command: ["--requirepass=Bisp@123"]
+    ports:
+      - "6379:6379"
+    volumes:
+      - dflydata:/data
+    restart: unless-stopped
+
+
 volumes:
   sql_data:
+  dflydata:
