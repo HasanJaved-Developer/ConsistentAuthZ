@@ -7,7 +7,7 @@ namespace UserManagementApi
 {
     public static class DbSeeder
     {
-        public static void Seed(IServiceProvider serviceProvider)
+        public static void SeedCore(IServiceProvider serviceProvider)
         {
             using var scope = serviceProvider.CreateScope();
             var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
@@ -77,5 +77,81 @@ namespace UserManagementApi
 
             context.SaveChanges();
         }
+        public static void SeedFeatureApiPermissions(IServiceProvider serviceProvider)
+        {
+            using var scope = serviceProvider.CreateScope();
+            var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+
+            // 1) Ensure Administration category
+            var adminCat = db.Categories
+                .FirstOrDefault(c => c.Name == "Administration");
+            if (adminCat == null)
+            {
+                adminCat = new Category { Name = "Administration" };
+                db.Categories.Add(adminCat);
+                db.SaveChanges();
+            }
+
+            // 2) Ensure ApiLogs module
+            var apiLogs = db.Modules.FirstOrDefault(m =>
+                m.Name == "ApiLogs" &&
+                m.Controller == "ErrorLogs" &&
+                m.Action == "GetAllErrors");
+
+            if (apiLogs == null)
+            {
+                apiLogs = new Module
+                {
+                    Name = "ApiLogs",
+                    Area = "",
+                    Controller = "ErrorLogs",
+                    Action = "GetAllErrors",
+                    CategoryId = adminCat.Id,
+                    Type = "Api"
+                };
+                db.Modules.Add(apiLogs);
+                db.SaveChanges();
+            }
+
+            // 3) Ensure function
+            if (!db.Functions.Any(f => f.Code == "Api.Logs.View"))
+            {
+                db.Functions.Add(new Function
+                {
+                    Code = "Api.Logs.View",
+                    DisplayName = "Api View Logs",
+                    ModuleId = apiLogs.Id
+                });
+                db.SaveChanges();
+            }
+
+            // 4) Ensure allan user
+            var allan = db.Users.FirstOrDefault(u => u.UserName == "allan");
+            if (allan == null)
+            {
+                var hash = BCrypt.Net.BCrypt.HashPassword("allan");
+                allan = new AppUser
+                {
+                    UserName = "allan",
+                    Password = hash
+                };
+                db.Users.Add(allan);
+                db.SaveChanges();
+            }
+
+            // 5) Ensure allan ↔ Admin role
+            var adminRole = db.Roles.FirstOrDefault(r => r.Name == "Admin");
+            if (adminRole != null &&
+                !db.UserRoles.Any(ur => ur.UserId == allan.Id && ur.RoleId == adminRole.Id))
+            {
+                db.UserRoles.Add(new UserRole
+                {
+                    UserId = allan.Id,
+                    RoleId = adminRole.Id
+                });
+                db.SaveChanges();
+            }
+        }
     }
+    
 }

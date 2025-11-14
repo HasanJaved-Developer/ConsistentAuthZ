@@ -31,5 +31,17 @@
         <member name="M:UserManagementApi.Migrations.AddModuleTypeAndApiLogsSeed.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
             <inheritdoc />
         </member>
+        <member name="T:UserManagementApi.Migrations.AddModuleTypeDefault">
+            <inheritdoc />
+        </member>
+        <member name="M:UserManagementApi.Migrations.AddModuleTypeDefault.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:UserManagementApi.Migrations.AddModuleTypeDefault.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:UserManagementApi.Migrations.AddModuleTypeDefault.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <inheritdoc />
+        </member>
     </members>
 </doc>

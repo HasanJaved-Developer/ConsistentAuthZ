@@ -163,7 +163,8 @@ await app.MigrateAndSeedWithSqlLockAsync<AppDbContext>(
     {
         // IMPORTANT: remove Migrate() inside your seeder
         // Old: DbSeeder.Seed(IServiceProvider) (sync). Wrap to awaitable:
-        DbSeeder.Seed(sp);
+        DbSeeder.SeedCore(sp);
+        DbSeeder.SeedFeatureApiPermissions(sp);
         await Task.CompletedTask;
     });
 
