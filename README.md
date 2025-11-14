@@ -67,9 +67,11 @@ The project begins with UI-only permission to intentionally demonstrate an incon
 
 ### 📸 Screenshots
 
-### 🔑 Jaeger
+### 🔑 Observability and Permissions
 
-![Jaeger](docs/screenshots/jaeger.png)
+![Api unauthorized](docs/screenshots/api_unauthorized.png)
+
+![Permissions](docs/screenshots/permissions.png)
 
 ---
 
