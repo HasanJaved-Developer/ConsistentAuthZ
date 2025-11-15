@@ -23,7 +23,10 @@ This project demonstrates **consistent authorization between a Web App and APIs,
 It runs as a **single-node, modular application**, but follows a **distributed-ready design** with clear service boundaries and optional RabbitMQ support for future event-driven scaling.
 
 **Key Idea:**
-Keep UI and API aligned — centralize authorization to avoid scattered permission checks.
+Keep UI and API aligned — centralize authorization to avoid scattered permission checks. 
+
+**Centralized RBAC model:** 
+Categories → Modules → Functions with WebApp/API types.
 
 **Demo Admin Account:** 
 allan / allan — useful for testing permissions in multiple browsers with shared cache.
