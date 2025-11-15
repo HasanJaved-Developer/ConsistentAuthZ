@@ -5,6 +5,7 @@
 [![Docker Compose CI](https://github.com/hasanjaved-developer/ConsistentAuthZ/actions/workflows/docker-compose-ci.yml/badge.svg)](https://github.com/hasanjaved-developer/ConsistentAuthZ/actions/workflows/docker-compose-ci.yml)
 [![License](https://img.shields.io/badge/License-MIT-blue?logo=github)](LICENSE.txt)
 [![Release](https://img.shields.io/github/v/tag/hasanjaved-developer/ConsistentAuthZ?label=release&sort=semver)](https://github.com/hasanjaved-developer/ConsistentAuthZ/tags)
+![Zero Windows Dependencies](https://img.shields.io/badge/Zero%20Windows%20Dependencies-Container%20Ready-blue?logo=linux)
 [![GHCR api](https://img.shields.io/badge/ghcr.io-consistent--authz%2Fapi-blue?logo=github)](https://ghcr.io/hasanjaved-developer/consistent-authz/api)
 [![GHCR userapi](https://img.shields.io/badge/ghcr.io-consistent--authz%2Fuserapi-blue?logo=github)](https://ghcr.io/hasanjaved-developer/consistent-authz/userapi)
 [![GHCR web](https://img.shields.io/badge/ghcr.io-consistent--authz%2Fweb-blue?logo=github)](https://ghcr.io/hasanjaved-developer/consistent-authz/web)
