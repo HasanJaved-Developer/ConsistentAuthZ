@@ -36,7 +36,7 @@ services:
       jaeger:
         condition: service_started
       dragonfly:
-        condition: service_startedy
+        condition: service_started
     volumes:
       - ./UserManagementApi/logs:/app/logs
 
