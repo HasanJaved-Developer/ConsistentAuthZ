@@ -2,7 +2,6 @@
 
 📌 This project is part of a sequence of learning and architectural evolution.  
 A more complete and production-ready version—including distributed caching and RabbitMQ—is available in the **MessageHub** repository.  
-Future enhancements and AI capabilities will continue there.
 
 [![Build](https://github.com/hasanjaved-developer/ConsistentAuthZ/actions/workflows/dotnet-tests.yml/badge.svg?branch=v1.0.1)](https://github.com/hasanjaved-developer/ConsistentAuthZ/actions/workflows/dotnet-tests.yml)
 [![codecov](https://codecov.io/gh/hasanjaved-developer/ConsistentAuthZ/branch/master/graph/badge.svg)](https://codecov.io/gh/hasanjaved-developer/ConsistentAuthZ)
